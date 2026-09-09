@@ -2,88 +2,76 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Gerenciador de Tarefas</title>
-  <style>
-    .erro { color: red; font-weight: bold; margin-top: 10px; }
-  </style>
+  <title>Tarefas</title>
 </head>
 <body>
-  <h1>Minhas Tarefas</h1>
-
-  <form id="form-tarefa">
-    <input type="text" id="titulo" placeholder="Nova tarefa..." required>
+  <h1>Lista de Tarefas</h1>
+  <form id="form">
+    <input id="titulo" placeholder="Nova tarefa" required>
     <button type="submit">Adicionar</button>
   </form>
-
-  <div id="mensagem-erro" class="erro"></div>
-
-  <ul id="lista-tarefas"></ul>
+  <ul id="lista"></ul>
+  <p id="erro" style="color:red"></p>
 
   <script>
-    const API_URL = 'http://localhost:3000/api/tarefas';
-
-    const form = document.getElementById('form-tarefa');
+    const api = 'http://localhost:3000/api/tarefas';
+    const form = document.getElementById('form');
     const inputTitulo = document.getElementById('titulo');
-    const listaTarefas = document.getElementById('lista-tarefas');
-    const divErro = document.getElementById('mensagem-erro');
-
-    function exibirErro(mensagem) {
-      divErro.textContent = mensagem;
-    }
+    const lista = document.getElementById('lista');
+    const erroEl = document.getElementById('erro');
 
     function limparErro() {
-      divErro.textContent = '';
+      erroEl.textContent = '';
     }
 
-    // Buscar tarefas via GET
+    function exibirErro(mensagem) {
+      erroEl.textContent = mensagem;
+    }
+
+    // Ao carregar a página, busca as tarefas com fetch e exibe na lista
     async function carregarTarefas() {
       limparErro();
       try {
-        const resposta = await fetch(API_URL);
-
-        if (!resposta.ok) {
-          throw new Error(`Erro ao buscar tarefas: ${resposta.statusText}`);
-        }
-
-        const tarefas = await resposta.json();
-        listaTarefas.innerHTML = '';
+        const res = await fetch(api);
+        if (!res.ok) throw new Error(`Erro ao buscar tarefas (${res.status})`);
+        
+        const tarefas = await res.json();
+        lista.innerHTML = '';
         
         tarefas.forEach(tarefa => {
           const li = document.createElement('li');
           li.textContent = tarefa.titulo;
-          listaTarefas.appendChild(li);
+          lista.appendChild(li);
         });
-      } catch (erro) {
-        exibirErro(`Erro na requisição: ${erro.message}`);
+      } catch (err) {
+        exibirErro(`Erro de rede/API: ${err.message}`);
       }
     }
 
-    // Adicionar tarefa via POST sem recarregar a página
+    // Ao submeter o formulário, envia POST com { titulo } e atualiza a lista
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       limparErro();
 
       const titulo = inputTitulo.value.trim();
+      if (!titulo) return;
 
       try {
-        const resposta = await fetch(API_URL, {
+        const res = await fetch(api, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ titulo })
         });
 
-        if (!resposta.ok) {
-          throw new Error(`Falha ao criar tarefa: ${resposta.statusText}`);
-        }
+        if (!res.ok) throw new Error(`Erro ao adicionar tarefa (${res.status})`);
 
         inputTitulo.value = '';
-        await carregarTarefas(); // Atualiza a lista
-      } catch (erro) {
-        exibirErro(`Erro ao enviar tarefa: ${erro.message}`);
+        await carregarTarefas();
+      } catch (err) {
+        exibirErro(`Erro de rede/API: ${err.message}`);
       }
     });
 
-    // Carrega as tarefas ao iniciar a página
     carregarTarefas();
   </script>
 </body>
