@@ -1,48 +1,37 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Configuração do CORS exigida
+// Configuração do CORS exigida na descrição do exercício
 app.use(cors({ origin: 'http://localhost:3001' }));
 
-// Middleware para processar JSON
+// Middleware para interpretar o corpo das requisições JSON
 app.use(express.json());
 
-// Servir arquivos estáticos da pasta 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+// Servir os arquivos da pasta public na raiz /
+app.use(express.static('public'));
 
 let tarefas = [];
 let nextId = 1;
 
-// GET / -> Serve o arquivo index.html (garantia explícita para os testes)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// GET /api/tarefas -> Retorna 200 + Array
+// GET /api/tarefas -> 200 + JSON com array de tarefas
 app.get('/api/tarefas', (req, res) => {
   res.status(200).json(tarefas);
 });
 
-// POST /api/tarefas -> Valida título e retorna 201 ou 400
+// POST /api/tarefas -> 201 + tarefa criada
 app.post('/api/tarefas', (req, res) => {
-  const { titulo } = req.body || {};
+  const { titulo } = req.body;
 
-  // Se o título não for enviado ou for vazio, o teste espera status 400
-  if (!titulo || typeof titulo !== 'string' || !titulo.trim()) {
-    return res.status(400).json({ erro: 'O título da tarefa é obrigatório' });
+  if (!titulo) {
+    return res.status(400).json({ mensagem: 'Título é obrigatório' });
   }
 
-  const novaTarefa = {
-    id: nextId++,
-    titulo: titulo.trim()
-  };
-
+  const novaTarefa = { id: nextId++, titulo };
   tarefas.push(novaTarefa);
-  return res.status(201).json(novaTarefa);
+
+  res.status(201).json(novaTarefa);
 });
 
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(3000, () => console.log('Servidor rodando na porta 3000'));

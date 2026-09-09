@@ -6,15 +6,19 @@
 </head>
 <body>
   <h1>Lista de Tarefas</h1>
+
   <form id="form">
     <input id="titulo" placeholder="Nova tarefa" required>
     <button type="submit">Adicionar</button>
   </form>
+
   <ul id="lista"></ul>
   <p id="erro" style="color:red"></p>
 
   <script>
-    const api = 'http://localhost:3000/api/tarefas';
+    // URL relativa para funcionar independente da porta onde o teste estiver rodando
+    const api = '/api/tarefas';
+
     const form = document.getElementById('form');
     const inputTitulo = document.getElementById('titulo');
     const lista = document.getElementById('lista');
@@ -28,27 +32,25 @@
       erroEl.textContent = mensagem;
     }
 
-    // Ao carregar a página, busca as tarefas com fetch e exibe na lista
     async function carregarTarefas() {
       limparErro();
       try {
         const res = await fetch(api);
-        if (!res.ok) throw new Error(`Erro ao buscar tarefas (${res.status})`);
-        
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+
         const tarefas = await res.json();
         lista.innerHTML = '';
-        
+
         tarefas.forEach(tarefa => {
           const li = document.createElement('li');
           li.textContent = tarefa.titulo;
           lista.appendChild(li);
         });
       } catch (err) {
-        exibirErro(`Erro de rede/API: ${err.message}`);
+        exibirErro(err.message);
       }
     }
 
-    // Ao submeter o formulário, envia POST com { titulo } e atualiza a lista
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       limparErro();
@@ -63,12 +65,12 @@
           body: JSON.stringify({ titulo })
         });
 
-        if (!res.ok) throw new Error(`Erro ao adicionar tarefa (${res.status})`);
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
 
         inputTitulo.value = '';
         await carregarTarefas();
       } catch (err) {
-        exibirErro(`Erro de rede/API: ${err.message}`);
+        exibirErro(err.message);
       }
     });
 
