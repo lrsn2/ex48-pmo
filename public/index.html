@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<<<<<<< HEAD
 <head>
   <meta charset="UTF-8">
   <title>Gerenciador de Tarefas</title>
@@ -88,3 +89,23 @@
   </script>
 </body>
 </html>
+=======
+<head><meta charset="UTF-8"><title>Tarefas</title></head>
+<body>
+  <h1>Lista de Tarefas</h1>
+  <form id="form">
+    <input id="titulo" placeholder="Nova tarefa" required>
+    <button type="submit">Adicionar</button>
+  </form>
+  <ul id="lista"></ul>
+  <p id="erro" style="color:red"></p>
+
+  <script>
+    const api = 'http://localhost:3000/api/tarefas';
+    // TODO: ao carregar a página, busca as tarefas com fetch e exibe na lista
+    // TODO: ao submeter o formulário, envia POST com { titulo } e atualiza a lista
+    // TODO: erros de rede/API devem ser exibidos no elemento #erro
+  </script>
+</body>
+</html>
+>>>>>>> bee0ad75895fa9e62952f33d0ef109bbc4a483cc

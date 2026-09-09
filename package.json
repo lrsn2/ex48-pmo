@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "meu-projeto",
   "version": "1.0.0",
   "description": "",
@@ -14,4 +15,12 @@
     "cors": "^2.8.6",
     "express": "^5.2.1"
   }
+=======
+  "name": "ex48-full-stack-integracao",
+  "version": "1.0.0",
+  "description": "Exercício 48 — Integração Full-Stack",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.18.2", "cors": "^2.8.5" }
+>>>>>>> bee0ad75895fa9e62952f33d0ef109bbc4a483cc
 }
