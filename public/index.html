@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciador de Tarefas</title>
+  <style>
+    .erro { color: red; font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Minhas Tarefas</h1>
+
+  <form id="form-tarefa">
+    <input type="text" id="titulo" placeholder="Nova tarefa..." required>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <div id="mensagem-erro" class="erro"></div>
+
+  <ul id="lista-tarefas"></ul>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api/tarefas';
+
+    const form = document.getElementById('form-tarefa');
+    const inputTitulo = document.getElementById('titulo');
+    const listaTarefas = document.getElementById('lista-tarefas');
+    const divErro = document.getElementById('mensagem-erro');
+
+    function exibirErro(mensagem) {
+      divErro.textContent = mensagem;
+    }
+
+    function limparErro() {
+      divErro.textContent = '';
+    }
+
+    // Buscar tarefas via GET
+    async function carregarTarefas() {
+      limparErro();
+      try {
+        const resposta = await fetch(API_URL);
+
+        if (!resposta.ok) {
+          throw new Error(`Erro ao buscar tarefas: ${resposta.statusText}`);
+        }
+
+        const tarefas = await resposta.json();
+        listaTarefas.innerHTML = '';
+        
+        tarefas.forEach(tarefa => {
+          const li = document.createElement('li');
+          li.textContent = tarefa.titulo;
+          listaTarefas.appendChild(li);
+        });
+      } catch (erro) {
+        exibirErro(`Erro na requisição: ${erro.message}`);
+      }
+    }
+
+    // Adicionar tarefa via POST sem recarregar a página
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      limparErro();
+
+      const titulo = inputTitulo.value.trim();
+
+      try {
+        const resposta = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo })
+        });
+
+        if (!resposta.ok) {
+          throw new Error(`Falha ao criar tarefa: ${resposta.statusText}`);
+        }
+
+        inputTitulo.value = '';
+        await carregarTarefas(); // Atualiza a lista
+      } catch (erro) {
+        exibirErro(`Erro ao enviar tarefa: ${erro.message}`);
+      }
+    });
+
+    // Carrega as tarefas ao iniciar a página
+    carregarTarefas();
+  </script>
+</body>
+</html>
